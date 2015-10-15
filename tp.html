@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title></title>
+    <script src="vendor/underscore.js" type="application/javascript"></script>
     <script>
 
         function distance(x1, y1,  x2, y2) {
-            return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+            return Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2);
         }
 
         function init() {
             var canvas = document.getElementById("canvas");
             canvas.style.backgroundColor = "#ddd";
-
             var context = canvas.getContext("2d");
-            var redColor = "#f00";
-            context.fillStyle = redColor;
 
+            var redColor = "#f00";
             var blueColor = "#00f";
             var greenColor = "#0f0";
             var cyanColor = "#0ff";
+
             var references = [
                 {x: 32,    y: 0,    color: redColor},
                 {x: 78,    y: 28,   color: blueColor},
@@ -31,25 +31,22 @@
                 {x: 800,   y: 600,  color: cyanColor}
             ];
 
-            function findClosestReference(x, y) {
-                var minDist = Number.MAX_VALUE;
-                var minReference = null;
-                for (var i = 0; i < references.length; i++) {
-                    var reference = references[i];
-                    var dist = distance(x, y, reference.x, reference.y);
-                    if(dist < minDist) {
-                        minDist = dist;
-                        minReference = reference;
-                    }
-                }
-                return minReference;
+            function referenceDistance(r, x, y) {
+                return {color: r.color, dist: distance(x, y, r.x, r.y)}
             }
 
-            for(var y = 0; y < 600; y++) {
-                for(var x = 0; x < 800; x++) {
+            function findClosestColor(x, y) {
+                return _.chain(references)
+                        .map(function(r) { return referenceDistance(r, x, y);})
+                        .sortBy('dist')
+                        .map(function(rd) { return rd.color } )
+                        .first()
+                        .value();
+            }
 
-                    var closestReference = findClosestReference(x, y);
-                    var color = closestReference.color;
+            for(var y = 0; y < canvas.height; y++) {
+                for(var x = 0; x < canvas.width; x++) {
+                    var color = findClosestColor(x, y);;
                     context.fillStyle = color;
 
                     context.fillRect(x,y,1,1);
