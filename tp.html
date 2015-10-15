@@ -15,24 +15,33 @@
 
             var context = canvas.getContext("2d");
             context.fillStyle = "#f00";
+
+            var references = [
+                {x: 32,    y: 0,   color:"#f00"},
+                {x: 78,    y: 28, color:"#00f"},
+                {x: 80,    y: 100,   color:"#0f0"},
+                {x: 800,   y: 600, color:"#0ff"}
+            ];
+
+            function findClosestReference(x, y) {
+                var minDist = Number.MAX_VALUE;
+                var minReference = null;
+                for (var i = 0; i < references.length; i++) {
+                    var reference = references[i];
+                    var dist = distance(x, y, reference.x, reference.y);
+                    if(dist < minDist) {
+                        minDist = dist;
+                        minReference = reference;
+                    }
+                }
+                return minReference;
+            }
+
             for(var y = 0; y < 600; y++) {
                 for(var x = 0; x < 800; x++) {
-                    var dist1 = distance(x, y , 0, 0);
-                    var dist2 = distance(x, y , 0, 600);
-                    var dist3 = distance(x, y , 800, 0);
-                    var dist4 = distance(x, y , 800, 600);
 
-                    var color;
-                    if( Math.min(dist1, dist2, dist3, dist4) == dist1) {
-                        color = "#f00";
-                    } else if( Math.min(dist1, dist2, dist3, dist4) == dist2) {
-                        color = "#00f";
-                    }  else if( Math.min(dist1, dist2, dist3, dist4) == dist3) {
-                        color = "#0f0";
-                    }  else if( Math.min(dist1, dist2, dist3, dist4) == dist4) {
-                        color = "#0ff";
-                    }
-
+                    var closestReference = findClosestReference(x, y);
+                    var color = closestReference.color;
                     context.fillStyle = color;
 
                     context.fillRect(x,y,1,1);
