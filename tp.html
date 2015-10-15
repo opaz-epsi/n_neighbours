@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script>
+
+        function distance(x1, y1,  x2, y2) {
+            return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+        }
+
+        function init() {
+            var canvas = document.getElementById("canvas");
+            canvas.style.backgroundColor = "#ddd";
+
+            var context = canvas.getContext("2d");
+            context.fillStyle = "#f00";
+            for(var y = 0; y < 600; y++) {
+                for(var x = 0; x < 800; x++) {
+                    var dist1 = distance(x, y , 0, 0);
+                    var dist2 = distance(x, y , 0, 600);
+                    var dist3 = distance(x, y , 800, 0);
+                    var dist4 = distance(x, y , 800, 600);
+
+                    var color;
+                    if( Math.min(dist1, dist2, dist3, dist4) == dist1) {
+                        color = "#f00";
+                    } else if( Math.min(dist1, dist2, dist3, dist4) == dist2) {
+                        color = "#00f";
+                    }  else if( Math.min(dist1, dist2, dist3, dist4) == dist3) {
+                        color = "#0f0";
+                    }  else if( Math.min(dist1, dist2, dist3, dist4) == dist4) {
+                        color = "#0ff";
+                    }
+
+                    context.fillStyle = color;
+
+                    context.fillRect(x,y,1,1);
+                }
+            }
+        }
+    </script>
+</head>
+<body onload="init()">
+<canvas id="canvas" width="800" height="600" style="background-color: #f00;"></canvas>
+</body>
+</html>
