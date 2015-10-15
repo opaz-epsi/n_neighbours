@@ -14,13 +14,21 @@
             canvas.style.backgroundColor = "#ddd";
 
             var context = canvas.getContext("2d");
-            context.fillStyle = "#f00";
+            var redColor = "#f00";
+            context.fillStyle = redColor;
 
+            var blueColor = "#00f";
+            var greenColor = "#0f0";
+            var cyanColor = "#0ff";
             var references = [
-                {x: 32,    y: 0,   color:"#f00"},
-                {x: 78,    y: 28, color:"#00f"},
-                {x: 80,    y: 100,   color:"#0f0"},
-                {x: 800,   y: 600, color:"#0ff"}
+                {x: 32,    y: 0,    color: redColor},
+                {x: 78,    y: 28,   color: blueColor},
+                {x: 80,    y: 100,  color: greenColor},
+                {x: 80,    y: 70,   color: blueColor},
+                {x: 120,   y: 320,  color: cyanColor},
+                {x: 400,   y: 510,  color: blueColor},
+                {x: 512,   y: 80,   color: redColor},
+                {x: 800,   y: 600,  color: cyanColor}
             ];
 
             function findClosestReference(x, y) {
