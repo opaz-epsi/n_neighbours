@@ -6,49 +6,91 @@
     <script src="vendor/underscore.js" type="application/javascript"></script>
     <script>
 
+        var redColor = "#f00";
+        var blueColor = "#00f";
+        var greenColor = "#0f0";
+        var cyanColor = "#0ff";
+
+        var references = [
+            {x: 32,    y: 0,    color: redColor},
+            {x: 78,    y: 28,   color: blueColor},
+            {x: 80,    y: 100,  color: greenColor},
+            {x: 80,    y: 70,   color: blueColor},
+            {x: 120,   y: 320,  color: cyanColor},
+            {x: 400,   y: 510,  color: blueColor},
+            {x: 512,   y: 80,   color: redColor},
+            {x: 800,   y: 600,  color: cyanColor}
+        ];
+
         function distance(x1, y1,  x2, y2) {
             return Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2);
         }
+
+        function referenceDistance(r, x, y) {
+            return {color: r.color, dist: distance(x, y, r.x, r.y)}
+        }
+
+        function addVote(votes, c) {
+            votes[c] = votes[c] ? votes[c] + 1 : 1;
+            return votes;
+        }
+
+        function referencesWithDistancesFrom(x, y) {
+            return _.map(references, function (r) {
+                return referenceDistance(r, x, y);
+            });
+        }
+
+        function referencesSortedByDistance(x, y) {
+            return _.sortBy(referencesWithDistancesFrom(x, y), 'dist');
+        }
+
+        function extractColors(sortedByDistance) {
+            return _.map(sortedByDistance, function (rd) {
+                return rd.color
+            });
+        }
+
+        function colorsByDistanceFrom(x, y) {
+            var sortedByDistance = referencesSortedByDistance(x, y);
+            return extractColors(sortedByDistance);
+        }
+
+        function nearestColorsByDistanceFrom(x, y, nearestCount) {
+            return _.first(colorsByDistanceFrom(x, y), nearestCount);
+        }
+
+        function numberOfVotesByColor(nearestColors) {
+            return _.reduce(nearestColors, function (votes, c) {
+                return addVote(votes, c);
+            }, {});
+        }
+
+
+        function mostVotedColor(votesByColor) {
+            var colors = _.keys(votesByColor);
+            return _.max(colors, function (color) {
+                return votesByColor[color];
+            });
+        }
+
+        function findClosestColor(x, y, neighboursCount) {
+            var nearestColors = nearestColorsByDistanceFrom(x, y, neighboursCount);
+            var votesByColor = numberOfVotesByColor(nearestColors);
+            var color = mostVotedColor(votesByColor);
+            return color;
+        }
+
 
         function init() {
             var canvas = document.getElementById("canvas");
             canvas.style.backgroundColor = "#ddd";
             var context = canvas.getContext("2d");
 
-            var redColor = "#f00";
-            var blueColor = "#00f";
-            var greenColor = "#0f0";
-            var cyanColor = "#0ff";
-
-            var references = [
-                {x: 32,    y: 0,    color: redColor},
-                {x: 78,    y: 28,   color: blueColor},
-                {x: 80,    y: 100,  color: greenColor},
-                {x: 80,    y: 70,   color: blueColor},
-                {x: 120,   y: 320,  color: cyanColor},
-                {x: 400,   y: 510,  color: blueColor},
-                {x: 512,   y: 80,   color: redColor},
-                {x: 800,   y: 600,  color: cyanColor}
-            ];
-
-            function referenceDistance(r, x, y) {
-                return {color: r.color, dist: distance(x, y, r.x, r.y)}
-            }
-
-            function findClosestColor(x, y) {
-                return _.chain(references)
-                        .map(function(r) { return referenceDistance(r, x, y);})
-                        .sortBy('dist')
-                        .map(function(rd) { return rd.color } )
-                        .first()
-                        .value();
-            }
-
             for(var y = 0; y < canvas.height; y++) {
                 for(var x = 0; x < canvas.width; x++) {
-                    var color = findClosestColor(x, y);;
-                    context.fillStyle = color;
-
+                    var fillStyle = findClosestColor(x, y, 1);
+                    context.fillStyle = fillStyle;
                     context.fillRect(x,y,1,1);
                 }
             }
